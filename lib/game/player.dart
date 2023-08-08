@@ -1,6 +1,8 @@
 import 'package:flame/components.dart';
+import 'package:flame/experimental.dart';
+import 'game.dart';
 
-class Player extends SpriteComponent {
+class Player extends SpriteComponent with HasGameReference<SpaceShooter> {
   Player({Sprite? sprite, Vector2? position, Vector2? size})
       : super(sprite: sprite, position: position, size: size);
 
@@ -12,6 +14,10 @@ class Player extends SpriteComponent {
     // TODO: implement update
     super.update(dt);
     this.position += _moveDirection.normalized() * _speed * dt;
+    position.clamp(
+      Vector2.zero(),
+      game.fixedResolution - size,
+    );
   }
 
   void setMoveDirection(Vector2 newMoveDirection) {
