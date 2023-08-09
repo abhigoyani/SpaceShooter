@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:spaceshooter/game/bullet.dart';
 import 'package:spaceshooter/game/enemy.dart';
 import 'package:spaceshooter/game/enemy_manager.dart';
 import 'package:spaceshooter/game/player.dart';
@@ -13,9 +13,11 @@ class SpaceShooter extends FlameGame with PanDetector {
   Offset? _pointerStartPosition;
   Offset? _pointerCurrentPosition;
   final double _joysticRadius = 60;
-  late Vector2 fixedResolution;
 
+  late Vector2 fixedResolution;
   late Player player;
+  late EnemyManager _enemyManager;
+  late BulletShooter _bulletShooter;
 
   @override
   Future<void> onLoad() async {
@@ -27,11 +29,31 @@ class SpaceShooter extends FlameGame with PanDetector {
     player =
         Player(sprite: spaceShip, size: Vector2.all(64), position: size / 2);
 
-    add(player);
+    _enemyManager = EnemyManager(enemySprite: spaceShip);
 
-    EnemyManager enemyManager = EnemyManager(enemySprite: spaceShip);
-    add(enemyManager);
+    _bulletShooter = BulletShooter(bullet: spaceShip);
+
+    add(player);
+    add(_enemyManager);
+    add(_bulletShooter);
+
     return super.onLoad();
+  }
+
+  @override
+  void update(double dt) {
+    // TODO: implement update
+    super.update(dt);
+    final bullets = _bulletShooter.children.whereType<Bullet>();
+    for (final enemy in _enemyManager.children.whereType<Enemy>()) {
+      for (final bullet in bullets) {
+        if (enemy.containsPoint(bullet.position)) {
+          bullet.removeFromParent();
+          enemy.removeFromParent();
+          break;
+        }
+      }
+    }
   }
 
   @override
