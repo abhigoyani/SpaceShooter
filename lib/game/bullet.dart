@@ -1,8 +1,12 @@
+import 'dart:ui';
+
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
+import 'package:spaceshooter/game/enemy.dart';
 import 'package:spaceshooter/game/game.dart';
 
-class Bullet extends SpriteComponent {
+class Bullet extends SpriteComponent with CollisionCallbacks {
   Bullet({Sprite? sprite, Vector2? position, Vector2? size})
       : super(
           sprite: sprite,
@@ -10,7 +14,15 @@ class Bullet extends SpriteComponent {
           size: size,
         );
 
-  double _speed = 450;
+  double _speed = 400;
+
+  @override
+  void onMount() {
+    // TODO: implement onMount
+    super.onMount();
+    final shape = RectangleHitbox();
+    add(shape);
+  }
 
   @override
   void update(double dt) {
@@ -21,11 +33,20 @@ class Bullet extends SpriteComponent {
       removeFromParent();
     }
   }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    // TODO: implement onCollision
+    super.onCollision(intersectionPoints, other);
+    if (other is Enemy) {
+      removeFromParent();
+    }
+  }
 }
 
 class BulletShooter extends Component with HasGameReference<SpaceShooter> {
   BulletShooter({required Sprite this.bullet}) : super() {
-    timer = Timer(0.3, onTick: _shootBullet, repeat: true);
+    timer = Timer(0.5, onTick: _shootBullet, repeat: true);
   }
 
   Sprite bullet;
@@ -34,10 +55,10 @@ class BulletShooter extends Component with HasGameReference<SpaceShooter> {
   void _shootBullet() {
     Bullet bullet = Bullet(
         sprite: this.bullet,
-        size: Vector2.all(16),
+        size: Vector2(14, 39.67),
         position: game.player.position.clone() + Vector2(32, 0));
     bullet.anchor = Anchor.center;
-    add(bullet);
+    game.add(bullet);
   }
 
   @override

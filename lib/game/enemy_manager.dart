@@ -28,7 +28,7 @@ class EnemyManager extends Component with HasGameReference<SpaceShooter> {
       position: postion,
     );
     enemy.anchor = Anchor.center;
-    add(enemy);
+    game.add(enemy);
   }
 
   @override
